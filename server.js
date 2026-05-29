@@ -36,6 +36,14 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
+console.log("DATABASE_URL exists:", !!process.env.DATABASE_URL);
+console.log("Using Neon:", !!process.env.DATABASE_URL);
+// Log which DB config is being used (helpful for local debugging)
+if (process.env.DATABASE_URL) {
+  console.log('Using DATABASE_URL for Postgres connection');
+} else {
+  console.log(`Using individual DB env vars: ${process.env.DB_USER || '<no user>'}@${process.env.DB_HOST || '<no host>'}:${process.env.DB_PORT || '<no port>'}/${process.env.DB_NAME || '<no db>'}`);
+}
 
 // Test database connection
 pool.on('error', (err) => {
@@ -184,10 +192,29 @@ app.use((err, req, res, next) => {
 // Start server when running locally
 if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`✓ Server running on http://localhost:${PORT}`);
-    console.log(`✓ Database: ${process.env.DB_NAME} on ${process.env.DB_HOST}:${process.env.DB_PORT}`);
-  });
+  try {
+    const server = app.listen(PORT, () => {
+      console.log(`✓ Server running on http://localhost:${PORT}`);
+      if (process.env.DATABASE_URL) {
+        console.log('✓ Database connection via DATABASE_URL');
+      } else {
+        console.log(`✓ Database: ${process.env.DB_NAME} on ${process.env.DB_HOST}:${process.env.DB_PORT}`);
+      }
+    });
+
+    server.on('error', (err) => {
+      if (err && err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Another instance may be running.`);
+        process.exit(1);
+      } else {
+        console.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
 
   // Graceful shutdown for local development
   process.on('SIGINT', () => {
