@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Talk to us — NeemLogic</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500&display=swap');
+
+/* ==========  BRAND TOKENS  ========== */
+:root{
+  --purple:#5E3A9E;
+  --purple-deep:#3F1F7A;
+  --purple-soft:#7B54BD;
+  --purple-tint:#F2EDFA;
+  --purple-line:#D9CCF0;
+  --teal:#2E8B7B;
+  --teal-bright:#3DA794;
+  --teal-soft:#6FCFB8;
+  --teal-tint:#E6F4F0;
+  --teal-line:#B8DDD2;
+  --ink:#1A1428;
+  --ink-soft:#5A5468;
+  --muted:#8A8598;
+  --cream:#F7F4EF;
+  --cream-line:#E6E0D4;
+  --paper:#FFFFFF;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Manrope',sans-serif;background:var(--cream);color:var(--ink);overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh}
+
+/* ==========  NAV  ========== */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.1rem 2.5rem;background:var(--paper);
+  border-bottom:0.5px solid var(--cream-line);
+  position:relative;z-index:10
+}
+.logo{display:flex;align-items:center}
+.logo-img{height:36px;width:auto;display:block}
+.footer-logo .logo-img{height:30px}
+.nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
+.nav-links a{font-size:13px;font-weight:400;color:var(--ink-soft);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:var(--purple)}
+.nav-links a.active{color:var(--purple);font-weight:500}
+.nav-cta{
+  background:var(--purple);color:#fff !important;
+  padding:8px 20px;border-radius:40px;font-weight:500 !important;font-size:13px !important;
+  transition:background 0.2s;text-decoration:none
+}
+.nav-cta:hover{background:var(--purple-deep) !important;color:#fff !important}
+
+/* ==========  HERO / PAGE  ========== */
+.contact{
+  flex:1;position:relative;overflow:visible;
+  background:linear-gradient(180deg,#FBF9F4 0%,#F4F0FC 60%,#EEF5F3 100%);
+  padding:4rem 2.5rem 5rem;
+  display:flex;align-items:flex-start;justify-content:center
+}
+
+/* Subtle dot grid */
+.contact-grid-bg{
+  position:absolute;inset:0;opacity:0.45;
+  background-image:radial-gradient(rgba(94,58,158,0.18) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none
+}
+
+/* Vibrant mesh orbs (animated, drifting) */
+.contact-mesh{position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:0}
+.contact-mesh-blob{
+  position:absolute;border-radius:50%;filter:blur(70px);
+  animation:meshDrift 22s ease-in-out infinite alternate
+}
+.contact-mesh-blob.b1{
+  width:520px;height:520px;left:-100px;top:-120px;
+  background:radial-gradient(circle at 50% 50%,rgba(94,58,158,0.45),rgba(94,58,158,0) 70%);
+  animation-delay:0s
+}
+.contact-mesh-blob.b2{
+  width:460px;height:460px;right:-80px;top:80px;
+  background:radial-gradient(circle at 50% 50%,rgba(46,139,123,0.42),rgba(46,139,123,0) 70%);
+  animation-delay:-8s
+}
+.contact-mesh-blob.b3{
+  width:440px;height:440px;left:50%;bottom:-200px;transform:translateX(-50%);
+  background:radial-gradient(circle at 50% 50%,rgba(123,84,189,0.28),rgba(123,84,189,0) 70%);
+  animation-delay:-14s
+}
+@keyframes meshDrift{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(-30px,40px) scale(1.08)}
+  100%{transform:translate(20px,-25px) scale(0.94)}
+}
+
+/* Content card */
+.contact-inner{
+  position:relative;z-index:2;max-width:760px;width:100%;
+  text-align:center
+}
+.contact-eyebrow{
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:500;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);
+  margin-bottom:1.5rem;display:inline-flex;align-items:center;gap:10px
+}
+.contact-eyebrow::before,.contact-eyebrow::after{content:'';width:28px;height:1px;background:var(--teal)}
+
+h1{
+  font-family:'Instrument Serif',serif;font-weight:400;
+  font-size:clamp(2.8rem,6vw,4.4rem);line-height:1.04;letter-spacing:-1.8px;
+  color:var(--ink);margin-bottom:1.4rem
+}
+h1 em{
+  font-style:italic;
+  background:linear-gradient(90deg,var(--purple) 0%,var(--teal) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+
+.contact-body{
+  font-size:16px;font-weight:300;color:var(--ink-soft);
+  line-height:1.8;margin:0 auto 2rem;max-width:520px
+}
+
+/* Quiet email line below the form — gives people a plain text address they can copy */
+.contact-email{
+  margin-top:2rem;
+  font-family:'Syne',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--muted)
+}
+.contact-email a{
+  color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--cream-line);
+  padding-bottom:2px;transition:color 0.2s, border-color 0.2s
+}
+.contact-email a:hover{color:var(--purple);border-color:var(--purple)}
+
+/* Subtle social row below */
+.contact-social{
+  margin-top:2.75rem;display:flex;gap:14px;justify-content:center;align-items:center;
+  padding-top:2rem;border-top:0.5px solid var(--cream-line);
+  max-width:340px;margin-left:auto;margin-right:auto
+}
+.contact-social-label{
+  font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--muted);margin-right:4px
+}
+.contact-social a{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--paper);border:0.5px solid var(--cream-line);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color 0.2s, transform 0.2s
+}
+.contact-social a:hover{border-color:var(--purple);transform:translateY(-2px)}
+.contact-social svg{width:14px;height:14px;fill:var(--ink-soft);transition:fill 0.2s}
+.contact-social a:hover svg{fill:var(--purple)}
+
+/* ==========  FOOTER  ========== */
+footer{
+  background:var(--paper);border-top:0.5px solid var(--cream-line);
+  padding:1.75rem 2.5rem;display:flex;justify-content:space-between;align-items:center
+}
+footer p{font-size:12px;color:var(--muted);font-weight:300}
+
+/* ==========  RESPONSIVE  ========== */
+@media (max-width:880px){
+  .nav-links li:not(:last-child){display:none}
+  .contact{padding:3rem 1.5rem 4rem}
+  h1{font-size:2.4rem}
+}
+
+/* Hero-embedded form shell — glassmorphism card, text-align reset to left */
+.hero-form-shell{
+  margin-top:2.5rem;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(28px) saturate(1.4);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);
+  border:0.5px solid rgba(214,204,240,0.55);
+  border-radius:28px;
+  padding:44px 48px;
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,0.9) inset,
+    0 32px 80px -8px rgba(63,31,122,0.10),
+    0 8px 24px -4px rgba(46,139,123,0.06);
+  text-align:left;
+}
+
+@media(max-width:768px){
+  .hero-form-shell{
+    padding:28px 22px;
+    margin-top:2rem;
+  }
+}
+
+#step1{
+transition:
+opacity .35s ease;
+}
+
+#success-card{
+opacity:0;
+transform:
+translateY(18px);
+transition:
+all .45s ease;
+}
+
+#success-card.show-success{
+opacity:1;
+transform:
+translateY(0);
+}
+
+.success-icon{
+animation:
+successPop .6s ease;
+}
+
+@keyframes successPop{
+
+0%{
+transform:
+scale(.7);
+opacity:0;
+}
+
+100%{
+transform:
+scale(1);
+opacity:1;
+}
+
+}
+#form-anchor .step-card{
+background:none;
+border:none;
+padding:0;
+}
+
+#form-anchor .step-title,
+#form-anchor .step-sub{
+display:none;
+}
+
+#form-anchor .field-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:18px;
+margin-bottom:18px;
+}
+
+#form-anchor .field-row.full{
+grid-template-columns:1fr;
+}
+
+#form-anchor .field-group{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+#form-anchor label{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+
+#form-anchor input,
+#form-anchor select,
+#form-anchor textarea{
+  width:100%;
+  padding:12px 15px;
+  font-size:14px;
+  font-family:'Manrope',sans-serif;
+  border:0.5px solid var(--cream-line);
+  border-radius:10px;
+  background:rgba(255,255,255,0.9);
+  color:var(--ink);
+  outline:none;
+  transition:.2s;
+  box-shadow:0 1px 3px rgba(26,20,40,0.04) inset;
+}
+
+#form-anchor input::placeholder,
+#form-anchor textarea::placeholder{
+  color:var(--muted);
+  opacity:0.75;
+}
+
+#form-anchor input:focus,
+#form-anchor select:focus,
+#form-anchor textarea:focus{
+border-color:var(--purple);
+box-shadow:0 0 0 4px rgba(94,58,158,.08);
+}
+
+#form-anchor textarea{
+min-height:120px;
+resize:vertical;
+}
+
+#form-anchor .phone-wrap{
+display:grid;
+grid-template-columns:110px 1fr;
+gap:10px;
+}
+
+#form-anchor .btn-row{
+  margin-top:24px;
+}
+
+#form-anchor .btn-submit{
+  width:100%;
+  height:52px;
+  border:none;
+  border-radius:12px;
+  background:var(--purple);
+  color:#fff;
+  font-size:14px;
+  font-weight:500;
+  font-family:'Manrope',sans-serif;
+  cursor:pointer;
+  transition:.2s;
+  letter-spacing:0.02em;
+  box-shadow:0 8px 24px -6px rgba(94,58,158,0.45);
+}
+
+#form-anchor .btn-submit:hover{
+  background:var(--purple-deep);
+  transform:translateY(-1px);
+  box-shadow:0 12px 32px -6px rgba(94,58,158,0.55);
+}
+
+#form-anchor .btn-submit.submitting{
+  opacity:0.7;
+  cursor:not-allowed;
+  transform:none;
+}
+
+#form-anchor .err-msg,
+#form-anchor .warn-msg{
+font-size:12px;
+color:#B23A3A;
+}
+
+#form-anchor .opt{
+color:var(--muted);
+}
+
+@media(max-width:768px){
+
+#form-anchor .field-row{
+grid-template-columns:1fr;
+}
+
+#form-anchor .phone-wrap{
+grid-template-columns:1fr;
+}
+
+}
+#success-card{
+  display:none;
+  text-align:center;
+  padding:48px 32px 40px;
+}
+
+#success-card.show-success{
+  display:block;
+  animation:successReveal .5s ease;
+}
+
+.success-icon{
+  width:60px;
+  height:60px;
+  margin:0 auto 20px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--teal-tint) 0%,rgba(255,255,255,0.9) 100%);
+  border:0.5px solid var(--teal-line);
+  color:var(--teal);
+  font-size:26px;
+  font-weight:500;
+  box-shadow:0 12px 32px rgba(46,139,123,0.14);
+}
+
+.success-title{
+  font-family:'Instrument Serif';
+  font-size:clamp(1.8rem,4vw,2.6rem);
+  line-height:1.1;
+  margin-bottom:14px;
+  color:var(--ink);
+}
+
+.success-sub{
+  max-width:400px;
+  margin:0 auto 32px;
+  font-size:15px;
+  line-height:1.75;
+  color:var(--ink-soft);
+  font-weight:300;
+}
+
+.success-meta{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-family:'Syne',sans-serif;
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding-top:24px;
+  border-top:0.5px solid var(--cream-line);
+  max-width:320px;
+  margin:0 auto;
+}
+
+.success-meta::before{
+  content:'';
+  width:20px;
+  height:0.5px;
+  background:var(--cream-line);
+}
+
+.success-meta::after{
+  content:'';
+  width:20px;
+  height:0.5px;
+  background:var(--cream-line);
+}
+
+.hero-form-shell.success-mode{
+  padding:52px 56px;
+}
+
+@keyframes successReveal{
+  0%{opacity:0;transform:translateY(16px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+</style>
+</head>
+<script>
+let submitting=false;
+
+const PUBLIC=['gmail','yahoo','hotmail','outlook','icloud','proton','zoho','aol','mail','yandex'];
+
+function showErr(id,msg){
+const el=document.getElementById(id);
+if(!el)return;
+const txt=el.querySelector('span');
+if(txt&&msg)txt.textContent=msg;
+el.classList.add('show');
+}
+
+function hideErr(id){
+const el=document.getElementById(id);
+if(el)el.classList.remove('show');
+}
+
+function setFieldErr(id,msg){
+const field=document.getElementById(id);
+if(!field)return;
+field.classList.add('err');
+showErr('e-'+id.replace('f-',''),msg);
+}
+
+function clearFieldErr(id){
+const field=document.getElementById(id);
+if(!field)return;
+field.classList.remove('err','warn');
+hideErr('e-'+id.replace('f-',''));
+hideErr('w-email');
+}
+
+['f-name','f-email','f-phone','f-company','f-title'].forEach(id=>{
+const field=document.getElementById(id);
+if(field)field.addEventListener('input',()=>clearFieldErr(id));
+});
+
+document.getElementById('f-name').addEventListener('blur',validateName);
+document.getElementById('f-email').addEventListener('blur',validateEmail);
+document.getElementById('f-phone').addEventListener('blur',validatePhone);
+
+function validateName(){
+const value=document.getElementById('f-name').value.trim();
+
+if(!value){
+setFieldErr('f-name','Full name is required');
+return false;
+}
+
+if(value.length<2||value.length>100){
+setFieldErr('f-name','Name must be 2–100 characters');
+return false;
+}
+
+if(!/^[a-zA-Z\s'-]+$/.test(value)){
+setFieldErr('f-name','Letters and spaces only');
+return false;
+}
+
+clearFieldErr('f-name');
+return true;
+}
+
+function validateEmail(){
+const email=document.getElementById('f-email');
+const value=email.value.trim();
+
+if(!value){
+setFieldErr('f-email','Work email required');
+return false;
+}
+
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){
+setFieldErr('f-email','Enter valid email');
+return false;
+}
+
+clearFieldErr('f-email');
+
+const domain=value.split('@')[1]?.split('.')[0]?.toLowerCase();
+
+if(PUBLIC.includes(domain)){
+email.classList.add('warn');
+document.getElementById('w-email').classList.add('show');
+}
+
+return true;
+}
+
+function validatePhone(){
+const value=document.getElementById('f-phone').value.replace(/\s/g,'');
+
+if(!value){
+setFieldErr('f-phone','Phone required');
+return false;
+}
+
+if(!/^\d{6,15}$/.test(value)){
+setFieldErr('f-phone','Enter a valid phone number');
+return false;
+}
+
+clearFieldErr('f-phone');
+return true;
+}
+
+function validateForm(){
+let ok=true;
+
+if(!validateName())ok=false;
+if(!validateEmail())ok=false;
+if(!validatePhone())ok=false;
+
+if(!document.getElementById('f-company').value.trim()){
+setFieldErr('f-company','Company required');
+ok=false;
+}
+
+if(!document.getElementById('f-title').value.trim()){
+setFieldErr('f-title','Job title required');
+ok=false;
+}
+
+return ok;
+}
+
+async function submitForm(){
+if(submitting)return;
+if(!validateForm())return;
+
+submitting=true;
+
+const btn=document.getElementById('btn-submit');
+btn.disabled=true;
+btn.classList.add('submitting');
+btn.innerHTML='Submitting…';
+
+try {
+  // Collect form data
+  const formData = {
+    name: document.getElementById('f-name').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    phone: document.getElementById('f-phone').value.replace(/\s/g,''),
+    countryCode: document.getElementById('f-cc').value,
+    company: document.getElementById('f-company').value.trim(),
+    title: document.getElementById('f-title').value.trim(),
+    companySize: document.getElementById('f-size').value || null,
+    requirements: document.getElementById('f-req').value.trim() || null
+  };
+
+  // Send to backend
+  const response = await fetch('/api/submit-inquiry', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Failed to submit inquiry');
+  }
+
+  // Show success after a brief delay
+  setTimeout(()=>{
+    const form=document.getElementById('step1');
+    const success=document.getElementById('success-card');
+    form.style.opacity='0';
+
+    setTimeout(()=>{
+      form.style.display='none';
+      success.style.display='block';
+
+      requestAnimationFrame(()=>{
+        success.classList.add('show-success');
+        document.querySelector('.hero-form-shell').classList.add('success-mode');
+      });
+
+      window.scrollTo({
+        top:success.offsetTop-120,
+        behavior:'smooth'
+      });
+
+      submitting=false;
+      btn.disabled=false;
+      btn.classList.remove('submitting');
+      btn.innerHTML='Submit inquiry';
+
+    },350);
+
+  },800);
+
+} catch (error) {
+  console.error('Submission error:', error);
+  setFieldErr('f-name', 'Submission failed: ' + error.message);
+  btn.disabled=false;
+  btn.classList.remove('submitting');
+  btn.innerHTML='Submit inquiry';
+  submitting=false;
+}
+}
+
+
+</script>
+
+<body>
+
+<!-- ==========  NAV  ========== -->
+<nav>
+  <div class="logo">
+    <a href="neemlogic_landing.html"><img src="neemlogic-logo.png" alt="NeemLogic" class="logo-img"></a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="neemlogic_landing.html">Home</a></li>
+    <li><a href="neemlogic_what_we_do.html">What we do</a></li>
+    <li><a href="#" class="nav-cta active">Talk to us</a></li>
+  </ul>
+</nav>
+
+<!-- ==========  CONTACT  ========== -->
+<section class="contact">
+  <div class="contact-grid-bg"></div>
+  <div class="contact-mesh">
+    <div class="contact-mesh-blob b1"></div>
+    <div class="contact-mesh-blob b2"></div>
+    <div class="contact-mesh-blob b3"></div>
+  </div>
+
+  <div class="contact-inner">
+    <span class="contact-eyebrow">Let's talk</span>
+    <h1>Tell us what you're<br><em>trying to build</em>.</h1>
+    <p class="contact-body">Whether you're reimagining a process, scoping a custom application, evaluating a platform, or just exploring where AI fits — we'd love to hear from you. A short note is enough to start a real conversation.</p>
+
+    <!-- Inline inquiry form -->
+    <div class="hero-form-shell">
+      <div id="form-anchor">
+        <div class="nl-wrap">
+
+          <div id="step1" class="step-card">
+
+            <div class="field-row">
+
+              <div class="field-group">
+                <label for="f-name">Full name <span class="req">*</span></label>
+                <input type="text" id="f-name" placeholder="Jane Smith" autocomplete="name">
+                <span class="err-msg" id="e-name"><span id="e-name-t">Required</span></span>
+              </div>
+
+              <div class="field-group">
+                <label for="f-email">Work email <span class="req">*</span></label>
+                <input type="email" id="f-email" placeholder="jane@company.com" autocomplete="email">
+                <span class="err-msg" id="e-email"><span id="e-email-t">Required</span></span>
+                <span class="warn-msg" id="w-email">Personal email — we recommend a work address</span>
+              </div>
+
+            </div>
+
+            <div class="field-row full field-group">
+              <label for="f-phone">Phone number <span class="req">*</span></label>
+
+              <div class="phone-wrap">
+                <select id="f-cc">
+                  <option value="+91">🇮🇳 +91</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+61">🇦🇺 +61</option>
+                  <option value="+971">🇦🇪 +971</option>
+                </select>
+
+                <input type="tel" id="f-phone" placeholder="9876543210" autocomplete="tel">
+              </div>
+
+              <span class="err-msg" id="e-phone"><span id="e-phone-t">Required</span></span>
+            </div>
+
+            <div class="field-row">
+
+              <div class="field-group">
+                <label for="f-company">Company name <span class="req">*</span></label>
+                <input type="text" id="f-company" placeholder="Acme Corp">
+                <span class="err-msg" id="e-company">Required</span>
+              </div>
+
+              <div class="field-group">
+                <label for="f-title">Job title <span class="req">*</span></label>
+                <input type="text" id="f-title" placeholder="VP of Technology">
+                <span class="err-msg" id="e-title">Required</span>
+              </div>
+
+            </div>
+
+            <div class="field-row full field-group">
+              <label for="f-size">
+                Company size <span class="opt">(optional)</span>
+              </label>
+
+              <select id="f-size">
+                <option value="">Select headcount range…</option>
+                <option value="1-10">1–10 employees</option>
+                <option value="11-50">11–50 employees</option>
+                <option value="51-200">51–200 employees</option>
+                <option value="201-1000">201–1,000 employees</option>
+                <option value="1000+">1,000+ employees</option>
+              </select>
+            </div>
+
+            <div class="field-row full field-group">
+              <label for="f-req">
+                Briefly describe your requirements
+                <span class="opt">(optional)</span>
+              </label>
+
+              <textarea
+                id="f-req"
+                maxlength="1000"
+                placeholder="Tell us about your requirements..."
+              ></textarea>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+                Submit inquiry
+              </button>
+            </div>
+
+          </div>
+
+          <div id="success-card" class="success-card" style="display:none">
+            <div class="success-icon">✓</div>
+
+            <div class="success-title">
+              Thank you for reaching out
+            </div>
+
+            <div class="success-sub">
+              Your inquiry has been received.
+              Our team will review your request and contact you shortly.
+            </div>
+
+            <div class="success-meta">We'll be in touch within one business day</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- /hero-form-shell -->
+
+    <!-- Email contact line -->
+    <div class="contact-email">
+      Or email us directly at&nbsp;
+      <a href="mailto:hello@neemlogic.com">hello@neemlogic.com</a>
+    </div>
+
+    <!-- Social row -->
+    <div class="contact-social">
+      <span class="contact-social-label">Follow</span>
+      <a href="#" aria-label="LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a href="#" aria-label="X (Twitter)" title="X">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==========  FOOTER  ========== -->
+<footer>
+  <div class="logo footer-logo">
+    <img src="neemlogic-logo.png" alt="NeemLogic" class="logo-img">
+  </div>
+  <p>© 2026 NeemLogic. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

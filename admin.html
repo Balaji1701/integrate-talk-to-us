@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeemLogic - Admin Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #5E3A9E;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #5E3A9E 0%, #3F1F7A 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #5E3A9E;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #3F1F7A;
+        }
+        
+        button.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        button.secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f8f8;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: #fafafa;
+        }
+        
+        .email-link {
+            color: #5E3A9E;
+            text-decoration: none;
+        }
+        
+        .email-link:hover {
+            text-decoration: underline;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .date-small {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #5E3A9E;
+        }
+        
+        .modal-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .modal-content strong {
+            color: #333;
+        }
+        
+        .modal-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 NeemLogic Admin Dashboard</h1>
+            <p>View and manage contact form submissions</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Submissions</h3>
+                    <div class="number" id="total-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>This Month</h3>
+                    <div class="number" id="month-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>This Week</h3>
+                    <div class="number" id="week-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Today</h3>
+                    <div class="number" id="today-count">0</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search by name, email, or company...">
+            </div>
+            <button onclick="loadSubmissions()">🔄 Refresh</button>
+            <button class="secondary" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+        
+        <div id="message-container"></div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Title</th>
+                        <th>Company Size</th>
+                        <th>Submitted</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="submissions-table">
+                    <tr>
+                        <td colspan="7" class="loading">Loading submissions...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Detail Modal -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <h2>Submission Details</h2>
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allSubmissions = [];
+        
+        async function loadSubmissions() {
+            try {
+                const response = await fetch('/api/submissions');
+                if (!response.ok) {
+                    throw new Error('Failed to load submissions');
+                }
+                
+                allSubmissions = await response.json();
+                renderSubmissions(allSubmissions);
+                updateStats();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+        
+        function renderSubmissions(submissions) {
+            const tbody = document.getElementById('submissions-table');
+            
+            if (submissions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading">No submissions found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = submissions.map(sub => `
+                <tr>
+                    <td>${escapeHtml(sub.full_name)}</td>
+                    <td><a href="mailto:${escapeHtml(sub.email)}" class="email-link">${escapeHtml(sub.email)}</a></td>
+                    <td>${escapeHtml(sub.company_name)}</td>
+                    <td>${escapeHtml(sub.job_title)}</td>
+                    <td>${sub.company_size ? '<span class="badge">' + escapeHtml(sub.company_size) + '</span>' : '—'}</td>
+                    <td>
+                        <div>${formatDate(sub.submitted_at)}</div>
+                        <div class="date-small">${formatTime(sub.submitted_at)}</div>
+                    </td>
+                    <td><button onclick="showDetails(${sub.id})">View</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function updateStats() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            let totalCount = allSubmissions.length;
+            let todayCount = allSubmissions.filter(s => new Date(s.submitted_at) >= today).length;
+            let weekCount = allSubmissions.filter(s => new Date(s.submitted_at) >= weekAgo).length;
+            let monthCount = allSubmissions.filter(s => new Date(s.submitted_at) >= monthAgo).length;
+            
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('today-count').textContent = todayCount;
+            document.getElementById('week-count').textContent = weekCount;
+            document.getElementById('month-count').textContent = monthCount;
+        }
+        
+        function showDetails(id) {
+            const sub = allSubmissions.find(s => s.id === id);
+            if (!sub) return;
+            
+            const html = `
+                <p><strong>Name:</strong> ${escapeHtml(sub.full_name)}</p>
+                <p><strong>Email:</strong> <a href="mailto:${escapeHtml(sub.email)}" class="email-link">${escapeHtml(sub.email)}</a></p>
+                <p><strong>Phone:</strong> ${escapeHtml(sub.country_code)} ${escapeHtml(sub.phone)}</p>
+                <p><strong>Company:</strong> ${escapeHtml(sub.company_name)}</p>
+                <p><strong>Job Title:</strong> ${escapeHtml(sub.job_title)}</p>
+                <p><strong>Company Size:</strong> ${sub.company_size || '—'}</p>
+                <p><strong>Requirements:</strong></p>
+                <p>${sub.requirements ? escapeHtml(sub.requirements).replace(/\n/g, '<br>') : '—'}</p>
+                <p><strong>Submitted:</strong> ${new Date(sub.submitted_at).toLocaleString()}</p>
+            `;
+            
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('detail-modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+        
+        function exportCSV() {
+            if (allSubmissions.length === 0) {
+                showMessage('No submissions to export', 'error');
+                return;
+            }
+            
+            let csv = 'ID,Full Name,Email,Phone,Country Code,Company,Job Title,Company Size,Requirements,Submitted At\n';
+            
+            allSubmissions.forEach(sub => {
+                csv += [
+                    sub.id,
+                    '"' + escapeHtml(sub.full_name).replace(/"/g, '""') + '"',
+                    sub.email,
+                    sub.phone,
+                    sub.country_code,
+                    '"' + escapeHtml(sub.company_name).replace(/"/g, '""') + '"',
+                    '"' + escapeHtml(sub.job_title).replace(/"/g, '""') + '"',
+                    sub.company_size || '',
+                    '"' + (sub.requirements || '').replace(/"/g, '""') + '"',
+                    sub.submitted_at
+                ].join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `submissions-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+        
+        function showMessage(message, type = 'success') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${escapeHtml(message)}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        function formatTime(dateString) {
+            return new Date(dateString).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allSubmissions.filter(sub =>
+                sub.full_name.toLowerCase().includes(query) ||
+                sub.email.toLowerCase().includes(query) ||
+                sub.company_name.toLowerCase().includes(query)
+            );
+            renderSubmissions(filtered);
+        });
+        
+        // Close modal on outside click
+        document.getElementById('detail-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'detail-modal') {
+                closeModal();
+            }
+        });
+        
+        // Load submissions on page load
+        loadSubmissions();
+    </script>
+</body>
+</html>
