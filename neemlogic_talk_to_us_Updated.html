@@ -448,7 +448,7 @@ grid-template-columns:1fr;
 <script>
 let submitting=false;
 
-const PUBLIC=['gmail','yahoo','hotmail','outlook','icloud','proton','zoho','aol','mail','yandex'];
+const PUBLIC=['gmail','yahoo','hotmail','outlook','icloud','proton','zoho','aol','mail','yandex','neemlogic'];
 
 function showErr(id,msg){
 const el=document.getElementById(id);
@@ -482,6 +482,10 @@ hideErr('w-email');
 const field=document.getElementById(id);
 if(field)field.addEventListener('input',()=>clearFieldErr(id));
 });
+
+function isBusinessEmail(email){
+
+}
 
 document.getElementById('f-name').addEventListener('blur',validateName);
 document.getElementById('f-email').addEventListener('blur',validateEmail);
@@ -530,8 +534,10 @@ const domain=value.split('@')[1]?.split('.')[0]?.toLowerCase();
 if(PUBLIC.includes(domain)){
 email.classList.add('warn');
 document.getElementById('w-email').classList.add('show');
+clearFieldErr('f-email');
+setFieldErr('f-email','Do not enter personal email address. Enter a valid work email address');
+return false;
 }
-
 return true;
 }
 
@@ -658,7 +664,7 @@ try {
 <!-- ==========  NAV  ========== -->
 <nav>
   <div class="logo">
-    <a href="neemlogic_landing.html"><img src="neemlogic-logo.png" alt="NeemLogic" class="logo-img"></a>
+    <a href="neemlogic_landing.html"><img src="/neemlogic-logo.png" alt="NeemLogic" class="logo-img"></a>
   </div>
   <ul class="nav-links">
     <li><a href="neemlogic_landing.html">Home</a></li>
@@ -700,7 +706,7 @@ try {
                 <label for="f-email">Work email <span class="req">*</span></label>
                 <input type="email" id="f-email" placeholder="jane@company.com" autocomplete="email">
                 <span class="err-msg" id="e-email"><span id="e-email-t">Required</span></span>
-                <span class="warn-msg" id="w-email">Personal email — we recommend a work address</span>
+                <span class="warn-msg" id="w-email"></span>
               </div>
 
             </div>
@@ -710,11 +716,11 @@ try {
 
               <div class="phone-wrap">
                 <select id="f-cc">
-                  <option value="+91">🇮🇳 +91</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+61">🇦🇺 +61</option>
-                  <option value="+971">🇦🇪 +971</option>
+                  <option value="+91">INDIA +91</option>
+                  <option value="+1">USA +1</option>
+                  <option value="+44">UK +44</option>
+                  <option value="+61">AUSTRALIA +61</option>
+                  <option value="+971">UAE +971</option>
                 </select>
 
                 <input type="tel" id="f-phone" placeholder="9876543210" autocomplete="tel">
@@ -745,7 +751,7 @@ try {
               </label>
 
               <select id="f-size">
-                <option value="">Select headcount range…</option>
+                <option value="">Select Employee Size…</option>
                 <option value="1-10">1–10 employees</option>
                 <option value="11-50">11–50 employees</option>
                 <option value="51-200">51–200 employees</option>
@@ -798,7 +804,7 @@ try {
     <!-- Email contact line -->
     <div class="contact-email">
       Or email us directly at&nbsp;
-      <a href="mailto:hello@neemlogic.com">hello@neemlogic.com</a>
+      <a href="mailto:info@neemlogic.com">info@neemlogic.com</a>
     </div>
 
     <!-- Social row -->
