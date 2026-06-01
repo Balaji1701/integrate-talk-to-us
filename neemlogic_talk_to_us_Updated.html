@@ -428,7 +428,16 @@ gap:12px;
 
 #form-anchor .err-msg,
 #form-anchor .warn-msg{
-display:none !important;
+display:none;
+color:#d24f4f;
+font-size:13px;
+line-height:1.4;
+margin-top:8px;
+}
+
+#form-anchor .err-msg.show,
+#form-anchor .warn-msg.show{
+display:block;
 }
 
 #form-anchor .form-error-summary{
@@ -564,8 +573,11 @@ const PUBLIC=['gmail','yahoo','hotmail','outlook','icloud','proton','zoho','aol'
 function showErr(id,msg){
 const el=document.getElementById(id);
 if(!el)return;
-const txt=el.querySelector('span');
-if(txt&&msg)txt.textContent=msg;
+if(msg){
+  const txt=el.querySelector('span');
+  if(txt) txt.textContent = msg;
+  else el.textContent = msg;
+}
 el.classList.add('show');
 }
 
@@ -618,6 +630,19 @@ function setFieldErr(id,msg){
 const field=document.getElementById(id);
 if(!field)return;
 field.classList.add('err');
+const errorId = 'e-'+id;
+if(msg){
+  showErr(errorId,msg);
+} else {
+  const defaultMessages = {
+    'f-name':'Please enter a valid full name.',
+    'f-email':'Please enter a valid business email address.',
+    'f-phone':'Please enter a valid phone number.',
+    'f-company':'Please enter your company name.',
+    'f-title':'Please enter your job title.'
+  };
+  showErr(errorId, defaultMessages[id] || 'Please correct this field.');
+}
 showFormError();
 }
 
@@ -626,7 +651,7 @@ const field=document.getElementById(id);
 if(!field)return;
 if(!isFieldValid(id)) return;
 field.classList.remove('err','warn');
-hideErr('e-'+id.replace('f-',''));
+hideErr('e-'+id);
 updateFormValidationSummary();
 }
 
@@ -1033,7 +1058,7 @@ return false;
 const domain=value.split('@')[1]?.split('.')[0]?.toLowerCase();
 
 if(PUBLIC.includes(domain)){
-setFieldErr('f-email');
+setFieldErr('f-email','Public email addresses are not accepted. Please use your company email address.');
 return false;
 }
 
@@ -1207,11 +1232,13 @@ try {
               <div class="field-group">
                 <label for="f-name">Full name <span class="req">*</span></label>
                 <input type="text" id="f-name" placeholder="Jane Smith" autocomplete="name">
+                <span class="err-msg" id="e-f-name"></span>
               </div>
 
               <div class="field-group">
                 <label for="f-email">Work email <span class="req">*</span></label>
                 <input type="email" id="f-email" placeholder="jane@company.com" autocomplete="email">
+                <span class="err-msg" id="e-f-email"></span>
               </div>
 
             </div>
@@ -1234,6 +1261,7 @@ try {
 
                 <input type="tel" id="f-phone" placeholder="9876543210" autocomplete="tel">
               </div>
+              <span class="err-msg" id="e-f-phone"></span>
             </div>
 
             <div class="field-row">
