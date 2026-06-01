@@ -303,8 +303,95 @@ resize:vertical;
 
 #form-anchor .phone-wrap{
 display:grid;
-grid-template-columns:110px 1fr;
-gap:10px;
+grid-template-columns:260px 1fr;
+gap:12px;
+}
+
+#form-anchor .country-picker{
+  position:relative;
+  width:100%;
+  max-width:100%;
+}
+
+#form-anchor .country-toggle{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 14px;
+  border:0.5px solid var(--cream-line);
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink);
+  font-size:14px;
+  text-align:left;
+  cursor:pointer;
+  transition:.2s;
+}
+
+#form-anchor .country-toggle:focus{
+  outline:2px solid rgba(94,58,158,0.4);
+  outline-offset:2px;
+}
+
+#form-anchor .country-dropdown{
+  display:none;
+  position:absolute;
+  top: calc(100% + 10px);
+  left:0;
+  right:0;
+  z-index:20;
+  border:0.5px solid var(--cream-line);
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 18px 40px rgba(20,18,45,0.08);
+  overflow:hidden;
+}
+
+#form-anchor .country-dropdown.open{
+  display:block;
+}
+
+#form-anchor .country-search{
+  width:100%;
+  border:none;
+  border-bottom:0.5px solid var(--cream-line);
+  padding:12px 14px;
+  font-size:14px;
+  font-family:'Manrope',sans-serif;
+  color:var(--ink);
+  background:#fafafa;
+  outline:none;
+}
+
+#form-anchor .country-search:focus{
+  box-shadow:0 0 0 4px rgba(94,58,158,0.08);
+}
+
+#form-anchor .country-list{
+  max-height:260px;
+  overflow:auto;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+#form-anchor .country-option{
+  padding:12px 14px;
+  cursor:pointer;
+  font-size:14px;
+  color:var(--ink);
+}
+
+#form-anchor .country-option:hover,
+#form-anchor .country-option.active,
+#form-anchor .country-option[aria-selected="true"]{
+  background:#f2f5fa;
+}
+
+#form-anchor .country-toggle-icon{
+  margin-left:12px;
+  color:var(--ink-soft);
 }
 
 #form-anchor .btn-row{
@@ -341,8 +428,31 @@ gap:10px;
 
 #form-anchor .err-msg,
 #form-anchor .warn-msg{
-font-size:12px;
-color:#B23A3A;
+display:none !important;
+}
+
+#form-anchor .form-error-summary{
+  display:none;
+  margin-bottom:16px;
+  padding:14px 16px;
+  border:1px solid rgba(210,79,79,0.3);
+  border-radius:12px;
+  background:rgba(242,222,222,0.8);
+  color:#7e2b2b;
+  font-size:14px;
+  line-height:1.5;
+}
+
+#form-anchor .form-error-summary.show{
+  display:block;
+}
+
+#form-anchor input.err,
+#form-anchor select.err,
+#form-anchor textarea.err,
+#form-anchor .country-toggle.err{
+  border-color:#d24f4f;
+  box-shadow:0 0 0 4px rgba(210,79,79,0.12);
 }
 
 #form-anchor .opt{
@@ -447,6 +557,7 @@ grid-template-columns:1fr;
 </head>
 <script>
 let submitting=false;
+let formErrorSummary=null;
 
 const PUBLIC=['gmail','yahoo','hotmail','outlook','icloud','proton','zoho','aol','mail','yandex','neemlogic'];
 
@@ -463,33 +574,425 @@ const el=document.getElementById(id);
 if(el)el.classList.remove('show');
 }
 
+function showFormError(){
+  if(formErrorSummary) formErrorSummary.classList.add('show');
+}
+
+function hideFormError(){
+  if(formErrorSummary) formErrorSummary.classList.remove('show');
+}
+
+function updateFormValidationSummary(){
+  if(!formErrorSummary) return;
+  const hasError = !!document.querySelector('#form-anchor .err');
+  if(hasError) showFormError(); else hideFormError();
+}
+
+function isFieldValid(id){
+  const field=document.getElementById(id);
+  if(!field) return false;
+  const value=field.value.trim();
+
+  if(id==='f-name'){
+    return value.length>=2 && value.length<=100 && /^[a-zA-Z\s'-]+$/.test(value);
+  }
+
+  if(id==='f-email'){
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return false;
+    const domain=value.split('@')[1]?.split('.')[0]?.toLowerCase();
+    return !PUBLIC.includes(domain);
+  }
+
+  if(id==='f-phone'){
+    return /^\d{6,15}$/.test(field.value.replace(/\s/g,'')) && !!document.getElementById('f-country-code')?.value;
+  }
+
+  if(id==='f-company' || id==='f-title'){
+    return value.length > 0;
+  }
+
+  return true;
+}
+
 function setFieldErr(id,msg){
 const field=document.getElementById(id);
 if(!field)return;
 field.classList.add('err');
-showErr('e-'+id.replace('f-',''),msg);
+showFormError();
 }
 
 function clearFieldErr(id){
 const field=document.getElementById(id);
 if(!field)return;
+if(!isFieldValid(id)) return;
 field.classList.remove('err','warn');
 hideErr('e-'+id.replace('f-',''));
-hideErr('w-email');
+updateFormValidationSummary();
 }
 
-['f-name','f-email','f-phone','f-company','f-title'].forEach(id=>{
-const field=document.getElementById(id);
-if(field)field.addEventListener('input',()=>clearFieldErr(id));
-});
+const countries = [
+  { name: 'Afghanistan', code: '+93' },
+  { name: 'Albania', code: '+355' },
+  { name: 'Algeria', code: '+213' },
+  { name: 'Andorra', code: '+376' },
+  { name: 'Angola', code: '+244' },
+  { name: 'Antigua and Barbuda', code: '+1268' },
+  { name: 'Argentina', code: '+54' },
+  { name: 'Armenia', code: '+374' },
+  { name: 'Aruba', code: '+297' },
+  { name: 'Australia', code: '+61' },
+  { name: 'Austria', code: '+43' },
+  { name: 'Azerbaijan', code: '+994' },
+  { name: 'Bahamas', code: '+1242' },
+  { name: 'Bahrain', code: '+973' },
+  { name: 'Bangladesh', code: '+880' },
+  { name: 'Barbados', code: '+1246' },
+  { name: 'Belarus', code: '+375' },
+  { name: 'Belgium', code: '+32' },
+  { name: 'Belize', code: '+501' },
+  { name: 'Benin', code: '+229' },
+  { name: 'Bhutan', code: '+975' },
+  { name: 'Bolivia', code: '+591' },
+  { name: 'Bosnia and Herzegovina', code: '+387' },
+  { name: 'Botswana', code: '+267' },
+  { name: 'Brazil', code: '+55' },
+  { name: 'Brunei', code: '+673' },
+  { name: 'Bulgaria', code: '+359' },
+  { name: 'Burkina Faso', code: '+226' },
+  { name: 'Burundi', code: '+257' },
+  { name: 'Cabo Verde', code: '+238' },
+  { name: 'Cambodia', code: '+855' },
+  { name: 'Cameroon', code: '+237' },
+  { name: 'Canada', code: '+1' },
+  { name: 'Cayman Islands', code: '+1345' },
+  { name: 'Central African Republic', code: '+236' },
+  { name: 'Chad', code: '+235' },
+  { name: 'Chile', code: '+56' },
+  { name: 'China', code: '+86' },
+  { name: 'Colombia', code: '+57' },
+  { name: 'Comoros', code: '+269' },
+  { name: 'Congo (Republic)', code: '+242' },
+  { name: 'Congo (DRC)', code: '+243' },
+  { name: 'Costa Rica', code: '+506' },
+  { name: 'Côte d’Ivoire', code: '+225' },
+  { name: 'Croatia', code: '+385' },
+  { name: 'Cuba', code: '+53' },
+  { name: 'Curaçao', code: '+599' },
+  { name: 'Cyprus', code: '+357' },
+  { name: 'Czechia', code: '+420' },
+  { name: 'Denmark', code: '+45' },
+  { name: 'Djibouti', code: '+253' },
+  { name: 'Dominica', code: '+1767' },
+  { name: 'Dominican Republic', code: '+1809' },
+  { name: 'Ecuador', code: '+593' },
+  { name: 'Egypt', code: '+20' },
+  { name: 'El Salvador', code: '+503' },
+  { name: 'Equatorial Guinea', code: '+240' },
+  { name: 'Eritrea', code: '+291' },
+  { name: 'Estonia', code: '+372' },
+  { name: 'Eswatini', code: '+268' },
+  { name: 'Ethiopia', code: '+251' },
+  { name: 'Fiji', code: '+679' },
+  { name: 'Finland', code: '+358' },
+  { name: 'France', code: '+33' },
+  { name: 'Gabon', code: '+241' },
+  { name: 'Gambia', code: '+220' },
+  { name: 'Georgia', code: '+995' },
+  { name: 'Germany', code: '+49' },
+  { name: 'Ghana', code: '+233' },
+  { name: 'Greece', code: '+30' },
+  { name: 'Grenada', code: '+1473' },
+  { name: 'Guatemala', code: '+502' },
+  { name: 'Guinea', code: '+224' },
+  { name: 'Guinea-Bissau', code: '+245' },
+  { name: 'Guyana', code: '+592' },
+  { name: 'Haiti', code: '+509' },
+  { name: 'Honduras', code: '+504' },
+  { name: 'Hungary', code: '+36' },
+  { name: 'Iceland', code: '+354' },
+  { name: 'India', code: '+91' },
+  { name: 'Indonesia', code: '+62' },
+  { name: 'Iran', code: '+98' },
+  { name: 'Iraq', code: '+964' },
+  { name: 'Ireland', code: '+353' },
+  { name: 'Israel', code: '+972' },
+  { name: 'Italy', code: '+39' },
+  { name: 'Jamaica', code: '+1876' },
+  { name: 'Japan', code: '+81' },
+  { name: 'Jordan', code: '+962' },
+  { name: 'Kazakhstan', code: '+7' },
+  { name: 'Kenya', code: '+254' },
+  { name: 'Kiribati', code: '+686' },
+  { name: 'Kuwait', code: '+965' },
+  { name: 'Kyrgyzstan', code: '+996' },
+  { name: 'Laos', code: '+856' },
+  { name: 'Latvia', code: '+371' },
+  { name: 'Lebanon', code: '+961' },
+  { name: 'Lesotho', code: '+266' },
+  { name: 'Liberia', code: '+231' },
+  { name: 'Libya', code: '+218' },
+  { name: 'Liechtenstein', code: '+423' },
+  { name: 'Lithuania', code: '+370' },
+  { name: 'Luxembourg', code: '+352' },
+  { name: 'Madagascar', code: '+261' },
+  { name: 'Malawi', code: '+265' },
+  { name: 'Malaysia', code: '+60' },
+  { name: 'Maldives', code: '+960' },
+  { name: 'Mali', code: '+223' },
+  { name: 'Malta', code: '+356' },
+  { name: 'Marshall Islands', code: '+692' },
+  { name: 'Mauritania', code: '+222' },
+  { name: 'Mauritius', code: '+230' },
+  { name: 'Mexico', code: '+52' },
+  { name: 'Micronesia', code: '+691' },
+  { name: 'Moldova', code: '+373' },
+  { name: 'Monaco', code: '+377' },
+  { name: 'Mongolia', code: '+976' },
+  { name: 'Montenegro', code: '+382' },
+  { name: 'Morocco', code: '+212' },
+  { name: 'Mozambique', code: '+258' },
+  { name: 'Myanmar', code: '+95' },
+  { name: 'Namibia', code: '+264' },
+  { name: 'Nauru', code: '+674' },
+  { name: 'Nepal', code: '+977' },
+  { name: 'Netherlands', code: '+31' },
+  { name: 'New Zealand', code: '+64' },
+  { name: 'Nicaragua', code: '+505' },
+  { name: 'Niger', code: '+227' },
+  { name: 'Nigeria', code: '+234' },
+  { name: 'North Korea', code: '+850' },
+  { name: 'North Macedonia', code: '+389' },
+  { name: 'Norway', code: '+47' },
+  { name: 'Oman', code: '+968' },
+  { name: 'Pakistan', code: '+92' },
+  { name: 'Palau', code: '+680' },
+  { name: 'Panama', code: '+507' },
+  { name: 'Papua New Guinea', code: '+675' },
+  { name: 'Paraguay', code: '+595' },
+  { name: 'Peru', code: '+51' },
+  { name: 'Philippines', code: '+63' },
+  { name: 'Poland', code: '+48' },
+  { name: 'Portugal', code: '+351' },
+  { name: 'Qatar', code: '+974' },
+  { name: 'Romania', code: '+40' },
+  { name: 'Russia', code: '+7' },
+  { name: 'Rwanda', code: '+250' },
+  { name: 'Saint Kitts and Nevis', code: '+1869' },
+  { name: 'Saint Lucia', code: '+1758' },
+  { name: 'Saint Vincent and the Grenadines', code: '+1784' },
+  { name: 'Samoa', code: '+685' },
+  { name: 'San Marino', code: '+378' },
+  { name: 'Sao Tome and Principe', code: '+239' },
+  { name: 'Saudi Arabia', code: '+966' },
+  { name: 'Senegal', code: '+221' },
+  { name: 'Serbia', code: '+381' },
+  { name: 'Seychelles', code: '+248' },
+  { name: 'Sierra Leone', code: '+232' },
+  { name: 'Singapore', code: '+65' },
+  { name: 'Slovakia', code: '+421' },
+  { name: 'Slovenia', code: '+386' },
+  { name: 'Solomon Islands', code: '+677' },
+  { name: 'Somalia', code: '+252' },
+  { name: 'South Africa', code: '+27' },
+  { name: 'South Korea', code: '+82' },
+  { name: 'South Sudan', code: '+211' },
+  { name: 'Spain', code: '+34' },
+  { name: 'Sri Lanka', code: '+94' },
+  { name: 'Sudan', code: '+249' },
+  { name: 'Suriname', code: '+597' },
+  { name: 'Sweden', code: '+46' },
+  { name: 'Switzerland', code: '+41' },
+  { name: 'Syria', code: '+963' },
+  { name: 'Taiwan', code: '+886' },
+  { name: 'Tajikistan', code: '+992' },
+  { name: 'Tanzania', code: '+255' },
+  { name: 'Thailand', code: '+66' },
+  { name: 'Timor-Leste', code: '+670' },
+  { name: 'Togo', code: '+228' },
+  { name: 'Tonga', code: '+676' },
+  { name: 'Trinidad and Tobago', code: '+1868' },
+  { name: 'Tunisia', code: '+216' },
+  { name: 'Turkey', code: '+90' },
+  { name: 'Turkmenistan', code: '+993' },
+  { name: 'Tuvalu', code: '+688' },
+  { name: 'Uganda', code: '+256' },
+  { name: 'Ukraine', code: '+380' },
+  { name: 'United Arab Emirates', code: '+971' },
+  { name: 'United Kingdom', code: '+44' },
+  { name: 'United States', code: '+1' },
+  { name: 'Uruguay', code: '+598' },
+  { name: 'Uzbekistan', code: '+998' },
+  { name: 'Vanuatu', code: '+678' },
+  { name: 'Vatican City', code: '+379' },
+  { name: 'Venezuela', code: '+58' },
+  { name: 'Vietnam', code: '+84' },
+  { name: 'Yemen', code: '+967' },
+  { name: 'Zambia', code: '+260' },
+  { name: 'Zimbabwe', code: '+263' }
+];
+
+let countryToggle, countryDropdown, countrySearch, countryList, selectedCountryLabel, countryCodeInput, countryPicker;
+let filteredCountries = [...countries];
+let activeCountryIndex = 0;
+
+function formatDialCode(code){
+  return code.startsWith('+1') && code.length > 2 ? `+1 ${code.slice(2)}` : code;
+}
+
+function renderCountryList(){
+  countryList.innerHTML = filteredCountries.map((country, index) => {
+    const displayCode = formatDialCode(country.code);
+    const isSelected = country.code === countryCodeInput.value;
+    return `<li class="country-option${isSelected ? ' active' : ''}" role="option" aria-selected="${isSelected}" data-index="${index}" data-code="${country.code}" data-name="${country.name}">${country.name} (${displayCode})</li>`;
+  }).join('');
+}
+
+function openCountryDropdown(){
+  filteredCountries = [...countries];
+  activeCountryIndex = filteredCountries.findIndex(c => c.code === countryCodeInput.value);
+  if(activeCountryIndex < 0) activeCountryIndex = 0;
+  countryDropdown.classList.add('open');
+  countryToggle.setAttribute('aria-expanded', 'true');
+  renderCountryList();
+  countrySearch.value = '';
+  countrySearch.focus();
+}
+
+function closeCountryDropdown(){
+  countryDropdown.classList.remove('open');
+  countryToggle.setAttribute('aria-expanded', 'false');
+}
+
+function setSelectedCountry(country){
+  countryCodeInput.value = country.code;
+  selectedCountryLabel.textContent = `${country.name} (${formatDialCode(country.code)})`;
+  renderCountryList();
+}
+
+function filterCountries(query){
+  const value = query.trim().toLowerCase();
+  filteredCountries = countries.filter(country =>
+    country.name.toLowerCase().includes(value) || country.code.includes(value)
+  );
+  if(filteredCountries.length === 0){
+    countryList.innerHTML = '<li class="country-option" role="option" aria-selected="false">No matching country found</li>';
+    return;
+  }
+  activeCountryIndex = 0;
+  renderCountryList();
+  highlightActiveCountry();
+}
+
+function highlightActiveCountry(){
+  const options = countryList.querySelectorAll('.country-option');
+  options.forEach((option, index) => {
+    option.classList.toggle('active', index === activeCountryIndex);
+  });
+}
+
+function initCountryPicker(){
+  countryToggle = document.getElementById('country-toggle');
+  countryDropdown = document.getElementById('country-dropdown');
+  countrySearch = document.getElementById('country-search');
+  countryList = document.getElementById('country-list');
+  selectedCountryLabel = document.getElementById('selected-country-label');
+  countryCodeInput = document.getElementById('f-country-code');
+  countryPicker = document.getElementById('country-picker');
+
+  if(!countryToggle || !countryDropdown || !countrySearch || !countryList || !selectedCountryLabel || !countryCodeInput || !countryPicker){
+    return;
+  }
+
+  countryToggle.addEventListener('click', () => {
+    if(countryDropdown.classList.contains('open')){
+      closeCountryDropdown();
+    } else {
+      openCountryDropdown();
+    }
+  });
+
+  countrySearch.addEventListener('input', (event) => {
+    filterCountries(event.target.value);
+  });
+
+  countrySearch.addEventListener('keydown', (event) => {
+    const options = countryList.querySelectorAll('.country-option');
+    if(!options.length) return;
+
+    if(event.key === 'ArrowDown'){
+      event.preventDefault();
+      activeCountryIndex = Math.min(activeCountryIndex + 1, options.length - 1);
+      highlightActiveCountry();
+      options[activeCountryIndex].scrollIntoView({ block: 'nearest' });
+    }
+
+    if(event.key === 'ArrowUp'){
+      event.preventDefault();
+      activeCountryIndex = Math.max(activeCountryIndex - 1, 0);
+      highlightActiveCountry();
+      options[activeCountryIndex].scrollIntoView({ block: 'nearest' });
+    }
+
+    if(event.key === 'Enter'){
+      event.preventDefault();
+      const option = options[activeCountryIndex];
+      if(option && option.dataset.code){
+        const country = filteredCountries[parseInt(option.dataset.index, 10)];
+        if(country) setSelectedCountry(country);
+        closeCountryDropdown();
+      }
+    }
+
+    if(event.key === 'Escape'){
+      closeCountryDropdown();
+      countryToggle.focus();
+    }
+  });
+
+  countryList.addEventListener('click', (event) => {
+    const option = event.target.closest('.country-option');
+    if(!option || !option.dataset.code) return;
+    const index = parseInt(option.dataset.index, 10);
+    const country = filteredCountries[index];
+    if(country) setSelectedCountry(country);
+    closeCountryDropdown();
+  });
+
+  document.addEventListener('click', (event) => {
+    if(!countryPicker.contains(event.target)){
+      closeCountryDropdown();
+    }
+  });
+
+  renderCountryList();
+}
+
+document.addEventListener('DOMContentLoaded', initCountryPicker);
 
 function isBusinessEmail(email){
 
 }
 
-document.getElementById('f-name').addEventListener('blur',validateName);
-document.getElementById('f-email').addEventListener('blur',validateEmail);
-document.getElementById('f-phone').addEventListener('blur',validatePhone);
+function attachFieldBlurListeners(){
+  formErrorSummary = document.getElementById('form-error-summary');
+
+  ['f-name','f-email','f-phone','f-company','f-title'].forEach(id=>{
+    const field=document.getElementById(id);
+    if(field)field.addEventListener('input',()=>clearFieldErr(id));
+  });
+
+  const nameField=document.getElementById('f-name');
+  const emailField=document.getElementById('f-email');
+  const phoneField=document.getElementById('f-phone');
+
+  if(nameField) nameField.addEventListener('blur',validateName);
+  if(emailField) emailField.addEventListener('blur',validateEmail);
+  if(phoneField) phoneField.addEventListener('blur',validatePhone);
+
+  updateFormValidationSummary();
+}
+
+document.addEventListener('DOMContentLoaded', attachFieldBlurListeners);
 
 function validateName(){
 const value=document.getElementById('f-name').value.trim();
@@ -518,31 +1021,34 @@ const email=document.getElementById('f-email');
 const value=email.value.trim();
 
 if(!value){
-setFieldErr('f-email','Work email required');
+setFieldErr('f-email');
 return false;
 }
 
 if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){
-setFieldErr('f-email','Enter valid email');
+setFieldErr('f-email');
 return false;
 }
-
-clearFieldErr('f-email');
 
 const domain=value.split('@')[1]?.split('.')[0]?.toLowerCase();
 
 if(PUBLIC.includes(domain)){
-email.classList.add('warn');
-document.getElementById('w-email').classList.add('show');
-clearFieldErr('f-email');
-setFieldErr('f-email','Do not enter personal email address. Enter a valid work email address');
+setFieldErr('f-email');
 return false;
 }
+
+clearFieldErr('f-email');
 return true;
 }
 
 function validatePhone(){
 const value=document.getElementById('f-phone').value.replace(/\s/g,'');
+const countryCodeValue=document.getElementById('f-country-code').value;
+
+if(!countryCodeValue){
+setFieldErr('f-phone','Country code is required');
+return false;
+}
 
 if(!value){
 setFieldErr('f-phone','Phone required');
@@ -566,13 +1072,19 @@ if(!validateEmail())ok=false;
 if(!validatePhone())ok=false;
 
 if(!document.getElementById('f-company').value.trim()){
-setFieldErr('f-company','Company required');
+setFieldErr('f-company');
 ok=false;
 }
 
 if(!document.getElementById('f-title').value.trim()){
-setFieldErr('f-title','Job title required');
+setFieldErr('f-title');
 ok=false;
+}
+
+if(!ok){
+  showFormError();
+} else {
+  hideFormError();
 }
 
 return ok;
@@ -595,11 +1107,7 @@ try {
     name: document.getElementById('f-name').value.trim(),
     email: document.getElementById('f-email').value.trim(),
     phone: document.getElementById('f-phone').value.replace(/\s/g,''),
-    countryCode: document.getElementById('f-cc').value,
-    company: document.getElementById('f-company').value.trim(),
-    title: document.getElementById('f-title').value.trim(),
-    companySize: document.getElementById('f-size').value || null,
-    requirements: document.getElementById('f-req').value.trim() || null
+    countryCode: document.getElementById('f-country-code').value,
   };
 
   // Send to backend
@@ -699,14 +1207,11 @@ try {
               <div class="field-group">
                 <label for="f-name">Full name <span class="req">*</span></label>
                 <input type="text" id="f-name" placeholder="Jane Smith" autocomplete="name">
-                <span class="err-msg" id="e-name"><span id="e-name-t">Required</span></span>
               </div>
 
               <div class="field-group">
                 <label for="f-email">Work email <span class="req">*</span></label>
                 <input type="email" id="f-email" placeholder="jane@company.com" autocomplete="email">
-                <span class="err-msg" id="e-email"><span id="e-email-t">Required</span></span>
-                <span class="warn-msg" id="w-email"></span>
               </div>
 
             </div>
@@ -715,18 +1220,20 @@ try {
               <label for="f-phone">Phone number <span class="req">*</span></label>
 
               <div class="phone-wrap">
-                <select id="f-cc">
-                  <option value="+91">INDIA +91</option>
-                  <option value="+1">USA +1</option>
-                  <option value="+44">UK +44</option>
-                  <option value="+61">AUSTRALIA +61</option>
-                  <option value="+971">UAE +971</option>
-                </select>
+                <div class="country-picker" id="country-picker">
+                  <button type="button" class="country-toggle" id="country-toggle" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="selected-country-label">India (+91)</span>
+                    <span class="country-toggle-icon" aria-hidden="true">▾</span>
+                  </button>
+                  <div class="country-dropdown" id="country-dropdown" role="listbox" aria-label="Select country code">
+                    <input type="search" id="country-search" class="country-search" placeholder="Search country" aria-label="Search country" autocomplete="off">
+                    <ul id="country-list" class="country-list"></ul>
+                  </div>
+                  <input type="hidden" id="f-country-code" name="countryCode" value="+91">
+                </div>
 
                 <input type="tel" id="f-phone" placeholder="9876543210" autocomplete="tel">
               </div>
-
-              <span class="err-msg" id="e-phone"><span id="e-phone-t">Required</span></span>
             </div>
 
             <div class="field-row">
@@ -734,13 +1241,11 @@ try {
               <div class="field-group">
                 <label for="f-company">Company name <span class="req">*</span></label>
                 <input type="text" id="f-company" placeholder="Acme Corp">
-                <span class="err-msg" id="e-company">Required</span>
               </div>
 
               <div class="field-group">
                 <label for="f-title">Job title <span class="req">*</span></label>
                 <input type="text" id="f-title" placeholder="VP of Technology">
-                <span class="err-msg" id="e-title">Required</span>
               </div>
 
             </div>
@@ -771,6 +1276,10 @@ try {
                 maxlength="1000"
                 placeholder="Tell us about your requirements...."
               ></textarea>
+            </div>
+
+            <div class="form-error-summary" id="form-error-summary" role="alert" aria-live="assertive">
+              Please review the highlighted fields and enter valid information before submitting.
             </div>
 
             <div class="btn-row">
