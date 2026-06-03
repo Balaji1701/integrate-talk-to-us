@@ -1,2 +1,5 @@
 const app = require('../server');
-module.exports = app;
+
+// Vercel expects a function handler for serverless functions.
+// Wrap the Express app so Vercel can invoke it per request.
+module.exports = (req, res) => app(req, res);
