@@ -1127,12 +1127,16 @@ btn.classList.add('submitting');
 btn.innerHTML='Submitting…';
 
 try {
-  // Collect form data
+  // Collect form data (include all fields expected by the backend)
   const formData = {
     name: document.getElementById('f-name').value.trim(),
     email: document.getElementById('f-email').value.trim(),
     phone: document.getElementById('f-phone').value.replace(/\s/g,''),
     countryCode: document.getElementById('f-country-code').value,
+    company: document.getElementById('f-company')?.value.trim() || '',
+    title: document.getElementById('f-title')?.value.trim() || '',
+    companySize: document.getElementById('f-company-size')?.value || '',
+    requirements: document.getElementById('f-requirements')?.value.trim() || ''
   };
 
   // Send to backend
@@ -1147,6 +1151,28 @@ try {
   const result = await response.json();
 
   if (!response.ok) {
+    // If validation errors are returned, show them inline
+    if (result && Array.isArray(result.errors)) {
+      result.errors.forEach(err => {
+        const param = err.param || err.path || '';
+        // Map backend param names to front-end field ids
+        const fieldMap = {
+          name: 'f-name',
+          email: 'f-email',
+          phone: 'f-phone',
+          countryCode: 'f-country-code',
+          company: 'f-company',
+          title: 'f-title',
+          companySize: 'f-company-size',
+          requirements: 'f-requirements'
+        };
+        const fieldId = fieldMap[param] || ('f-' + param);
+        setFieldErr(fieldId, err.msg || 'Invalid value');
+      });
+      // stop further success handling
+      throw new Error('Validation failed');
+    }
+
     throw new Error(result.message || 'Failed to submit inquiry');
   }
 
